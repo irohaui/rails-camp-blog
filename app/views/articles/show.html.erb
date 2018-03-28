@@ -1,14 +1,15 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <strong>Title:</strong>
-  <%= @article.title %>
-</p>
+<div id="title">
+  <div>
+    <p><%= @article.created_at %></p>
+    <h1><%= @article.title %></h1>
+  </div>
+</div>
 
-<p>
-  <strong>Body:</strong>
-  <%= @article.body %>
-</p>
-
-<%= link_to 'Edit', edit_article_path(@article) %> |
-<%= link_to 'Back', articles_path %>
+<div id="article_wrap">
+  <div id="content">
+    <%= @article.body %>
+  </div>
+  <div class="clear"></div>
+</div>
