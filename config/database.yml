@@ -48,7 +48,9 @@ test:
 #     url: <%= ENV['DATABASE_URL'] %>
 #
 production:
-  <<: *default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
   database: rails-camp-blog_production
   username: rails-camp-blog
   password: <%= ENV['RAILS-CAMP-BLOG_DATABASE_PASSWORD'] %>

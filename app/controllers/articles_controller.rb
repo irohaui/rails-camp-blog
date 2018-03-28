@@ -4,12 +4,15 @@ class ArticlesController < ApplicationController
   # GET /articles
   # GET /articles.json
   def index
-    @articles = Article.all
+    @articles = Article.all.order("created_at DESC")
+    # @article = Article.find(params[:id])
+    # @article.redis_access
   end
 
   # GET /articles/1
   # GET /articles/1.json
   def show
+    # @article.redis_access
   end
 
   # GET /articles/new
