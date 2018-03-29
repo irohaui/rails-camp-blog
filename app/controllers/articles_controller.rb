@@ -6,8 +6,8 @@ class ArticlesController < ApplicationController
   # GET /articles.json
   def index
     @articles = Article.all.order("created_at DESC")
-    ids = REDIS.zrevrange "ranking", 0, 4
-    @ranks = Article.where(id: ids)
+    ids = REDIS.zrevrangebyscore "ranking", "+inf", 0, limit: [0, 5]
+    @ranks = Article.find(ids)
   end
 
   # GET /articles/1
