@@ -15,12 +15,26 @@
       <% if user_signed_in? %>
         <p>
           <%= link_to '編集', edit_article_path(article) %>
-          <%= link_to '削除', article, method: :delete, data: { confirm: '本当によろしいですか?' } %>
+          <%= link_to '削除', article, method: :delete %>
+          <!-- , data: { confirm: '本当によろしいですか?' } -->
         </p>
       <% end %>
       <br>
       <hr>
     <% end %>
+  </div>
+  <div id="sidebar">
+    <h2>★PV数ランキング</h2>
+          <ul>
+            <% @ranks.each do |rank| %>
+            <li>
+              <%= link_to(rank.title, "/articles/#{rank.id}") %>
+              <span>
+                (<%= REDIS.zscore('ranking', rank.id).to_i %>PV)
+              </span>
+            </li>
+            <% end %>
+          </ul>
   </div>
   <div class="clear"></div>
 </div>

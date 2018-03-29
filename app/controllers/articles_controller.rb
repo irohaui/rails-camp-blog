@@ -1,18 +1,22 @@
 class ArticlesController < ApplicationController
   before_action :set_article, only: [:show, :edit, :update, :destroy]
   before_action :require_user_logged_in, only: [:new, :create, :edit, :update, :destroy]
+  require "redis"
   # GET /articles
   # GET /articles.json
   def index
     @articles = Article.all.order("created_at DESC")
-    # @article = Article.find(params[:id])
-    # @article.redis_access
+    ids = REDIS.zrevrange "ranking", 0, 4
+    @ranks = Article.where(id: ids)
   end
 
   # GET /articles/1
   # GET /articles/1.json
   def show
-    # @article.redis_access
+    @article = Article.find(params[:id])
+    REDIS.zincrby "ranking", 1, "#{@article.id}"
+    ids = REDIS.zrevrangebyscore "ranking", "+inf", 0, limit: [0, 5]
+    @ranks = Article.find(ids)
   end
 
   # GET /articles/new
@@ -31,8 +35,10 @@ class ArticlesController < ApplicationController
 
     respond_to do |format|
       if @article.save
-        format.html { redirect_to @article, notice: 'Article was successfully created.' }
+        format.html { redirect_to @article }
+        # , notice: 'Article was successfully created.'
         format.json { render :show, status: :created, location: @article }
+        REDIS.zadd("ranking", 0, @article.id)
       else
         format.html { render :new }
         format.json { render json: @article.errors, status: :unprocessable_entity }
@@ -45,7 +51,8 @@ class ArticlesController < ApplicationController
   def update
     respond_to do |format|
       if @article.update(article_params)
-        format.html { redirect_to @article, notice: 'Article was successfully updated.' }
+        format.html { redirect_to @article }
+        # , notice: 'Article was successfully updated.'
         format.json { render :show, status: :ok, location: @article }
       else
         format.html { render :edit }
@@ -57,9 +64,11 @@ class ArticlesController < ApplicationController
   # DELETE /articles/1
   # DELETE /articles/1.json
   def destroy
+    REDIS.zrem("ranking", @article.id)
     @article.destroy
     respond_to do |format|
-      format.html { redirect_to articles_url, notice: 'Article was successfully destroyed.' }
+      format.html { redirect_to articles_url }
+      # , notice: 'Article was successfully destroyed.'
       format.json { head :no_content }
     end
   end
@@ -74,4 +83,5 @@ class ArticlesController < ApplicationController
     def article_params
       params.require(:article).permit(:title, :body)
     end
+
 end
